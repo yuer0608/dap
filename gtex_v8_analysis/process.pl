@@ -17,10 +17,20 @@ for ($i=0;$i<=$#ARGV;$i++){
      $tissue = $ARGV[++$i];
      next;
    }
-   
+
+   if($ARGV[$i] eq "-a"){
+     $assemble_pl_path = $ARGV[++$i];
+     next;
+   }
+
+   if($ARGV[$i] eq "-p"){
+     $print_pl_path = $ARGV[++$i];
+     next;
+   }
+
    printf STDERR "Error: unknown option \"$ARGV[$i]\" \n";
    exit;
-}  
+}
 
 printf "Expression vcf file: $expr_file\n";
 printf "Genotype vcf file: $geno_vcf\n";
@@ -32,7 +42,7 @@ $tissue = "tissue" if !defined($tissue);
 open FILE, "zcat $expr_file | ";
 open CMD, ">$tissue.assemble.cmd";
 while(<FILE>){
-  
+
    next if $_ !~ /ENSG/;
    next if $_ !~ /\d/;
    my @data = split /\s+/, $_;
@@ -46,11 +56,14 @@ while(<FILE>){
    push @gene_list, $gene;
    open OUT , ">$tissue/$gene.cis_snp.bed";
    print OUT "$chr\t$pos1\t$pos2\n";
-   @expression = @data[4..$#data];
+    # @expression = @data[4..$#data];
+   # edit： get sixth col to file
+   @expression = @data[6..$#data];
    close OUT;
    open OUT, ">$tissue/$gene.expr";
    print OUT "pheno $gene gtex @expression\n";
    close OUT;
-   print CMD "perl assemble.pl $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat\n";
+    # print CMD "perl assemble.pl $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat\n";
+   #edit：  add print current sbanms file in console
+   print CMD "perl $assemble_pl_path $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat;echo $print_pl_path $tissue/$gene.sbams.dat";
 }
-   

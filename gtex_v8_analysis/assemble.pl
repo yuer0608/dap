@@ -36,7 +36,9 @@ while(<FILE>){
    if(/^\s*\#CHROM/){
       my @data = split /\s+/,$_;
 
-      shift @data until $data[0]=~/^\s*GTEX/;
+      # shift @data until $data[0]=~/^\s*GTEX/;
+      # edit： delete 9 col
+      shift @data for (1..9);
       @hash{@data} = (0..$#data);
       foreach $id (@id_list){
          push @index, $hash{$id};
@@ -54,13 +56,22 @@ while(<FILE>){
    @sdata = @data[@index];
    my @geno;
    foreach $d (@sdata){
-     next if $d !~ /\S\/\S/;
-    
-     $g = 0 if $d =~ /0\/0/;
-     $g = 1 if $d =~ /0\/1/;
-     $g = 1 if $d =~ /1\/0/;;
-     $g = 2 if $d =~ /1\/1/;;
-     $g = "NA" if $d =~ /\D\/\D/;
+     # next if $d !~ /\S\/\S/;
+     #
+     # $g = 0 if $d =~ /0\/0/;
+     # $g = 1 if $d =~ /0\/1/;
+     # $g = 1 if $d =~ /1\/0/;;
+     # $g = 2 if $d =~ /1\/1/;;
+     # $g = "NA" if $d =~ /\D\/\D/;
+
+     #edit：  [\/|\|] 匹配 0|0 或者 0/0 两种格式
+     next if $d !~ /\S[\/|\|]\S/;
+
+     $g = 0 if $d =~ /0[\/|\|]0/;
+     $g = 1 if $d =~ /0[\/|\|]1/;
+     $g = 1 if $d =~ /1[\/|\|]0/;;
+     $g = 2 if $d =~ /1[\/|\|]1/;;
+     $g = "NA" if $d =~ /\D[\/|\|]\D/;
      push @geno, $g;
    }
 
@@ -75,4 +86,3 @@ $expr_text = `cat $ARGV[2]`;
 print "$expr_text";
 print "$covar_text";
 print "$geno_text";
- 
