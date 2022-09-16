@@ -23,11 +23,6 @@ for ($i=0;$i<=$#ARGV;$i++){
      next;
    }
 
-   if($ARGV[$i] eq "-p"){
-     $print_pl_path = $ARGV[++$i];
-     next;
-   }
-
    printf STDERR "Error: unknown option \"$ARGV[$i]\" \n";
    exit;
 }
@@ -65,5 +60,5 @@ while(<FILE>){
    close OUT;
     # print CMD "perl assemble.pl $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat\n";
    #edit：  add print current sbanms file in console
-   print CMD "perl $assemble_pl_path $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat;echo $print_pl_path $tissue/$gene.sbams.dat";
+   print CMD "perl $assemble_pl_path $geno_vcf $tissue/$gene.cis_snp.bed $tissue/$gene.expr $covar_file > $tissue/$gene.sbams.dat;echo $tissue/$gene.sbams.dat is complete \n";
 }
